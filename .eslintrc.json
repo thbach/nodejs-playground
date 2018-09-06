@@ -2,6 +2,7 @@
   "extends": ["airbnb-base", "prettier"],
   "parser": "babel-eslint",
   "rules": {
+    "no-underscore-dangle": 1,
     "prettier/prettier": [
       "error",
       {
