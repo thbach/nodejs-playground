@@ -34,7 +34,8 @@ MongoClient.connect(
     //     console.log('unable to fetch todos', dbErr);
     //   });
 
-    db.collection('Users')
+    return db
+      .collection('Users')
       .find({ name: 'Thai' })
       .toArray()
       .then(res => {
