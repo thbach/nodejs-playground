@@ -1,8 +1,8 @@
-const { MongoClient, ObjectID } = require('mongodb');
+const {MongoClient, ObjectID} = require('mongodb');
 
 MongoClient.connect(
   'mongodb://localhost:27017/TodoApp',
-  { useNewUrlParser: true },
+  {useNewUrlParser: true},
   (err, client) => {
     if (err) {
       return console.log('unable to connect to mongodb server');
@@ -34,17 +34,17 @@ MongoClient.connect(
     //   });
 
     db.collection('Users')
-      .deleteMany({ name: 'Thai' })
+      .deleteMany({name: 'Thai'})
       .then(result => {
         console.log(result);
       });
 
     db.collection('Users')
-      .findOneAndDelete({ _id: ObjectID('5b920b235badf61600fc72f5') })
+      .findOneAndDelete({_id: ObjectID('5b920b235badf61600fc72f5')})
       .then(result => {
         console.log(result);
       });
 
-    // return client.close();
+    return client.close();
   }
 );
