@@ -6,7 +6,7 @@ const MONGODB_URI = `mongodb://${process.env.DB_USERNAME}:${
 
 mongoose.Promise = global.Promise;
 mongoose.connect(
-  MONGODB_URI || 'mongodb://localhost:27017/TodoApp',
+  'mongodb://localhost:27017/TodoApp' || MONGODB_URI,
   {useNewUrlParser: true}
 );
 
