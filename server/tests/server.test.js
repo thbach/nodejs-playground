@@ -108,3 +108,53 @@ mocha.describe('GET /todos/:id', () => {
       .end(done);
   });
 });
+
+mocha.describe('DELETE /todos/:id', () => {
+  mocha.it('should delete a todo', done => {
+    const hexId = todos[0]._id.toHexString();
+    request(app)
+      .delete(`/todos/${hexId}`)
+      .expect(200)
+      .expect(res => {
+        expect(res.body.todo.text).toBe(todos[0].text);
+      })
+      .end((err, res) => {
+        if (err) {
+          return done(err);
+        }
+
+        Todo.findById(hexId)
+          .then(todo => {
+            expect(todo).toNotExist();
+          })
+          .catch(e => done());
+
+        // Todo.findById(hexId)
+        //   .then(todos => {
+        //     expect(todos).toNotExist();
+        //   })
+        //   .then(() => {
+        //     Todo.find().then(todos => {
+        //       expect(todos.length).toBe(1);
+        //       done();
+        //     });
+        //   })
+        //   .catch(e => done(e));
+      });
+  });
+
+  mocha.it('should return 404 if todo not found', done => {
+    const hexId = new ObjectID().toHexString();
+    request(app)
+      .delete(`/todos/${hexId}`)
+      .expect(404)
+      .end(done);
+  });
+
+  mocha.it('should return 404 for non-object ids', done => {
+    request(app)
+      .delete('/todos/123abc')
+      .expect(404)
+      .end(done);
+  });
+});
