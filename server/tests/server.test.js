@@ -128,18 +128,6 @@ mocha.describe('DELETE /todos/:id', () => {
             expect(todo).toNotExist();
           })
           .catch(e => done());
-
-        // Todo.findById(hexId)
-        //   .then(todos => {
-        //     expect(todos).toNotExist();
-        //   })
-        //   .then(() => {
-        //     Todo.find().then(todos => {
-        //       expect(todos.length).toBe(1);
-        //       done();
-        //     });
-        //   })
-        //   .catch(e => done(e));
       });
   });
 
