@@ -1,8 +1,13 @@
 const mongoose = require('mongoose');
 
+const MONGODB_URI =
+  process.env.NODE_ENV === 'production'
+    ? `mongodb://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@ds151382.mlab.com:51382/node-todo-api`
+    : process.env.MONGODB_URI;
+
 mongoose.Promise = global.Promise;
 mongoose.connect(
-  process.env.MONGODB_URI,
+  MONGODB_URI,
   {useNewUrlParser: true}
 );
 
