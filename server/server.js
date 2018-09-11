@@ -77,6 +77,34 @@ app.delete('/todos/:id', (req, res) => {
     });
 });
 
+app.patch('/todos/:id', (req, res) => {
+  const {id} = req.params;
+  const {text, completed} = req.body;
+
+  if (!ObjectID.isValid(id)) {
+    return res.status(404).send();
+  }
+
+  if (typeof completed === 'boolean' && completed) {
+    req.body.completedAt = new Date().getTime();
+  } else {
+    req.body.completed = false;
+    req.body.completedAt = null;
+  }
+
+  Todo.findByIdAndUpdate(id, {$set: {text, completed, completedAt: req.body.completedAt}}, {new: true})
+    .then(todo => {
+      if (!todo) {
+        res.status(404).send();
+      }
+
+      res.send({todo});
+    })
+    .catch(e => {
+      res.status(400).send();
+    });
+});
+
 app.listen(port, () => {
   console.log('Started on port ', port);
 });
