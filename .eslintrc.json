@@ -3,6 +3,7 @@
   "parser": "babel-eslint",
   "rules": {
     "no-underscore-dangle": 1,
+    "consistent-return": "warn",
     "prettier/prettier": [
       "error",
       {
