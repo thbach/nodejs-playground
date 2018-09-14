@@ -5,25 +5,11 @@ const mocha = require('mocha');
 
 const {app} = require('./../server');
 const {Todo} = require('./../models/todo');
+const {User} = require('./../models/user');
+const {populateTodos, populateUsers, todos, users} = require('./seed/seed');
 
-const todos = [
-  {
-    _id: new ObjectID(),
-    text: 'First test todo',
-  },
-  {
-    _id: new ObjectID(),
-    text: 'Second test todo',
-    completed: true,
-    completedAt: 333,
-  },
-];
-
-mocha.beforeEach(done => {
-  Todo.deleteMany({})
-    .then(() => Todo.insertMany(todos))
-    .then(() => done());
-});
+mocha.beforeEach(populateUsers);
+mocha.beforeEach(populateTodos);
 
 mocha.describe('POST /todos', () => {
   mocha.it('should create a new todo', done => {
@@ -179,6 +165,78 @@ mocha.describe('PATCH /todos/:id', () => {
         expect(res.body.todo.completed).toBe(false);
         expect(res.body.todo.completedAt).toBe(null);
       })
+      .end(done);
+  });
+});
+
+mocha.describe('GET /users/me', () => {
+  mocha.it('should return users if auth', done => {
+    request(app)
+      .get('/users/me')
+      .set('x-auth', users[0].tokens[0].token)
+      .expect(200)
+      .expect(res => {
+        expect(res.body._id).toBe(users[0]._id.toHexString());
+        expect(res.body.email).toBe(users[0].email);
+      })
+      .end(done);
+  });
+
+  mocha.it('should reutnr 404 if not autrh', done => {
+    request(app)
+      .get('/users/me')
+      .expect(401)
+      .expect(res => {
+        expect(res.body).toEqual({});
+      })
+      .end(done);
+  });
+});
+
+mocha.describe('POST /users', () => {
+  mocha.it('should create a user', done => {
+    const email = 'example@example.com';
+    const password = '123amb';
+
+    request(app)
+      .post('/users')
+      .send({email, password})
+      .expect(200)
+      .expect(res => {
+        expect(res.headers['x-auth']).toBeDefined();
+        expect(res.body._id).toBeDefined();
+        expect(res.body.email).toBe(email);
+      })
+      .end(err => {
+        if (err) {
+          return done(err);
+        }
+        User.findOne({email}).then(user => {
+          expect(user).toBeDefined();
+          done();
+        });
+      });
+  });
+
+  mocha.it('should reutnr validation error if request invalid', done => {
+    const email = 'example2gmail.com';
+    const password = '1';
+
+    request(app)
+      .post('/users')
+      .send({email, password})
+      .expect(400)
+      .end(done);
+  });
+
+  mocha.it('should not create user if email in use', done => {
+    const {email} = users[1];
+    const password = '1234566';
+
+    request(app)
+      .post('/users')
+      .send({email, password})
+      .expect(400)
       .end(done);
   });
 });
