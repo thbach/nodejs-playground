@@ -51,6 +51,16 @@ UserSchema.methods.generateAuthToken = function generateAuthToken() {
   return user.save().then(() => token);
 };
 
+UserSchema.methods.removeToken = function removeToken(token) {
+  const user = this;
+
+  return user.update({
+    $pull: {
+      tokens: {token},
+    },
+  });
+};
+
 UserSchema.statics.findByToken = function findByToken(token) {
   const User = this;
   let decoded;
@@ -102,18 +112,6 @@ UserSchema.pre('save', function checkPassword(next) {
     next();
   }
 });
-
-// bcrypt.genSalt(10, (e, salt) => {
-//   bcrypt.hash(password, salt, (e, hash) => {
-//     console.log(hash);
-//   });
-// });
-
-// const hashedPassword = '$2a$10$SvjDUg/7.z11B82gkGRhu.AjZ.7v1gCdtY.A9zNDqUxc3pB0afxBS';
-
-// bcrypt.compare(password, hashedPassword, (e, res) => {
-//   console.log(res);
-// });
 
 const User = mongoose.model('Users', UserSchema);
 
