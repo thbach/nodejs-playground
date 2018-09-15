@@ -1,10 +1,10 @@
 require('./config/config');
+require('./db/mongoose');
 
 const express = require('express');
 const bodyParser = require('body-parser');
 const {ObjectID} = require('mongodb');
 
-const {mongoose} = require('./db/mongoose');
 const {Todo} = require('./models/todo');
 const {User} = require('./models/user');
 const {authenticate} = require('./middleware/authenticate');
@@ -58,7 +58,7 @@ app.get('/todos/:id', authenticate, (req, res) => {
 
       res.send({todo});
     })
-    .catch(e => {
+    .catch(() => {
       res.status(400).send();
     });
 });
@@ -78,7 +78,7 @@ app.delete('/todos/:id', authenticate, (req, res) => {
 
       res.send({todo});
     })
-    .catch(e => {
+    .catch(() => {
       res.status(400).send();
     });
 });
@@ -109,7 +109,7 @@ app.patch('/todos/:id', authenticate, (req, res) => {
       }
       res.send({todo});
     })
-    .catch(e => {
+    .catch(() => {
       res.status(400).send();
     });
 });
@@ -145,7 +145,7 @@ app.post('/users/login', (req, res) => {
         res.header('x-auth', token).send(user);
       });
     })
-    .catch(e => {
+    .catch(() => {
       res.status(400).send();
     });
 });
