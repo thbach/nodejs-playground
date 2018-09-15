@@ -211,10 +211,12 @@ mocha.describe('POST /users', () => {
         if (err) {
           return done(err);
         }
-        User.findOne({email}).then(user => {
-          expect(user).toBeDefined();
-          done();
-        });
+        User.findOne({email})
+          .then(user => {
+            expect(user).toBeDefined();
+            done();
+          })
+          .catch(e => done(e));
       });
   });
 
@@ -238,5 +240,50 @@ mocha.describe('POST /users', () => {
       .send({email, password})
       .expect(400)
       .end(done);
+  });
+});
+
+mocha.describe('POST /users/login', () => {
+  mocha.it('should login user and return auth token', done => {
+    request(app)
+      .post('/users/login')
+      .send({email: users[1].email, password: users[1].password})
+      .expect(200)
+      .expect(res => {
+        expect(res.headers['x-auth']).toBeDefined();
+      })
+      .end((e, res) => {
+        if (e) {
+          return done(e);
+        }
+        User.findById(users[1]._id)
+          .then(user => {
+            expect(user.tokens[0].access).toBe('auth');
+            expect(user.tokens[0].token).toBe(res.headers['x-auth']);
+            done();
+          })
+          .catch(e => done(e));
+      });
+  });
+
+  mocha.it('should reject invalid login', done => {
+    request(app)
+      .post('/users/login')
+      .send({email: users[1].email, password: 'passfswod'})
+      .expect(400)
+      .expect(res => {
+        expect(res.headers['x-auth']).toBeUndefined();
+      })
+      .end((e, res) => {
+        if (e) {
+          return done(e);
+        }
+        User.findById(users[1]._id)
+          .then(user => {
+            expect(user.tokens).toHaveLength(0);
+            done();
+          })
+          .catch(e => done(e));
+      });
   });
 });
